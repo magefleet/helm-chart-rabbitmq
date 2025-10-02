@@ -1,0 +1,4 @@
+repositoryID: helm-chart-rabbitmq
+owners:
+  - name: magefleet
+    email: info@magefleet.com
