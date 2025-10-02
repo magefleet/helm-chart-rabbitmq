@@ -1,0 +1,39 @@
+RabbitMQ {{ .Chart.AppVersion }} has been installed!
+
+1. Get the RabbitMQ credentials:
+
+   Username: {{ .Values.auth.username }}
+   Password: $(kubectl get secret --namespace {{ .Release.Namespace }} {{ include "rabbitmq.fullname" . }} -o jsonpath="{.data.rabbitmq-password}" | base64 -d)
+
+2. Access the RabbitMQ Management UI:
+
+{{- if .Values.ingress.enabled }}
+   The management UI is available at:
+   {{- range .Values.ingress.hosts }}
+   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{ (index .paths 0).path }}
+   {{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[1].nodePort}" services {{ include "rabbitmq.fullname" . }})
+   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+   echo "Management UI: http://$NODE_IP:$NODE_PORT"
+{{- else if contains "LoadBalancer" .Values.service.type }}
+   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "rabbitmq.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+   echo "Management UI: http://$SERVICE_IP:{{ .Values.service.managementPort }}"
+{{- else if contains "ClusterIP" .Values.service.type }}
+   kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "rabbitmq.fullname" . }} {{ .Values.service.managementPort }}:{{ .Values.service.managementPort }}
+   echo "Management UI: http://127.0.0.1:{{ .Values.service.managementPort }}"
+{{- end }}
+
+3. Connect to RabbitMQ:
+
+   AMQP Port: {{ .Values.service.port }}
+
+{{- if contains "ClusterIP" .Values.service.type }}
+   To connect from outside the cluster:
+   kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "rabbitmq.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+{{- end }}
+
+4. To get the Erlang cookie:
+
+   kubectl get secret --namespace {{ .Release.Namespace }} {{ include "rabbitmq.fullname" . }} -o jsonpath="{.data.rabbitmq-erlang-cookie}" | base64 -d
