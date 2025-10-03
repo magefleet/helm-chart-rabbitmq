@@ -9,9 +9,13 @@ nameOverride: ""
 fullnameOverride: ""
 
 auth:
-  username: admin
+  username: magefleet
   password: changeme
   erlangCookie: secretcookie
+  # Use an existing secret instead of creating one
+  existingSecret: ""
+  existingSecretPasswordKey: "rabbitmq-password"
+  existingSecretErlangCookieKey: "rabbitmq-erlang-cookie"
 
 service:
   type: ClusterIP

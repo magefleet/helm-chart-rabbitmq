@@ -3,7 +3,26 @@ entries:
   rabbitmq:
   - apiVersion: v2
     appVersion: 4.1.0
-    created: "2025-10-02T16:55:16.540001137+02:00"
+    created: "2025-10-03T18:00:15.132927722+02:00"
+    description: A Helm chart for RabbitMQ 4.1
+    digest: e11880162014d83351f71d75eb01fd253a57ebe7ae3733241e8e1bd3d2a80315
+    home: https://www.rabbitmq.com
+    keywords:
+    - rabbitmq
+    - message queue
+    - messaging
+    maintainers:
+    - name: rabbitmq
+    name: rabbitmq
+    sources:
+    - https://github.com/rabbitmq/rabbitmq-server
+    type: application
+    urls:
+    - https://magefleet.github.io/helm-chart-rabbitmq/rabbitmq-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 4.1.0
+    created: "2025-10-03T18:00:15.131867314+02:00"
     description: A Helm chart for RabbitMQ 4.1
     digest: 5d9a0fadb622dc329ad9b7548bb96b56b3c663b025cb297a4acb03c6087c2b14
     home: https://www.rabbitmq.com
@@ -20,4 +39,4 @@ entries:
     urls:
     - https://magefleet.github.io/helm-chart-rabbitmq/rabbitmq-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-02T16:55:16.53812416+02:00"
+generated: "2025-10-03T18:00:15.130755648+02:00"

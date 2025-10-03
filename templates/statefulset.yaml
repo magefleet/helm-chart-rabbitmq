@@ -23,6 +23,23 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+      - name: setup-cookie
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command:
+        - sh
+        - -c
+        - |
+          cp /tmp/erlang-cookie/.erlang.cookie /var/lib/rabbitmq/.erlang.cookie
+          chmod 600 /var/lib/rabbitmq/.erlang.cookie
+          chown 999:999 /var/lib/rabbitmq/.erlang.cookie
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/rabbitmq
+        - name: erlang-cookie
+          mountPath: /tmp/erlang-cookie
+        securityContext:
+          runAsUser: 0
       containers:
       - name: rabbitmq
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -37,13 +54,8 @@ spec:
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ include "rabbitmq.fullname" . }}
-              key: rabbitmq-password
-        - name: RABBITMQ_ERLANG_COOKIE
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "rabbitmq.fullname" . }}
-              key: rabbitmq-erlang-cookie
+              name: {{ default (include "rabbitmq.fullname" .) .Values.auth.existingSecret }}
+              key: {{ .Values.auth.existingSecretPasswordKey }}
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:
@@ -108,6 +120,18 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+      - name: erlang-cookie
+        secret:
+          secretName: {{ default (include "rabbitmq.fullname" .) .Values.auth.existingSecret }}
+          items:
+          - key: {{ .Values.auth.existingSecretErlangCookieKey }}
+            path: .erlang.cookie
+          defaultMode: 0400
+  {{- if not .Values.persistence.enabled }}
+      - name: data
+        emptyDir: {}
+  {{- end }}
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
@@ -121,8 +145,4 @@ spec:
       resources:
         requests:
           storage: {{ .Values.persistence.size | quote }}
-  {{- else }}
-  volumes:
-  - name: data
-    emptyDir: {}
   {{- end }}
