@@ -56,6 +56,8 @@ spec:
             secretKeyRef:
               name: {{ default (include "rabbitmq.fullname" .) .Values.auth.existingSecret }}
               key: {{ .Values.auth.existingSecretPasswordKey }}
+        - name: RABBITMQ_USE_LONGNAME
+          value: "true"
         - name: MY_POD_NAME
           valueFrom:
             fieldRef:

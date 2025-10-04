@@ -2,7 +2,7 @@ apiVersion: v2
 name: rabbitmq
 description: A Helm chart for RabbitMQ 4.1
 type: application
-version: 1.1.0
+version: 1.2.0
 appVersion: "4.1.0"
 keywords:
   - rabbitmq
